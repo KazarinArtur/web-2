@@ -1,11 +1,14 @@
 import {Box, Button, TextField} from "@mui/material";
 import {useState} from "react";
+import {useSigninMutation} from "@/store/authApi";
 
 export default function Signup() {
     const [email, setEmail] = useState("");
     const [isEmailError, setIsEmailError] = useState("");
 
     const [password, setPassword] = useState("");
+
+    const [signin] = useSigninMutation();
 
     return <Box component="form" sx={{
         display: "flex",
@@ -31,6 +34,11 @@ export default function Signup() {
                    onChange={(ev)=>setPassword(ev.target.value)}
                    label={"Enter password"}
         />
-        <Button variant={"outlined"}>Sign in</Button>
+        <Button variant={"outlined"} onClick={()=> {
+            if (!isEmailError) {
+                console.log({email, password});
+                signin({email, password});
+            }
+        }}>Sign in</Button>
     </Box>
 }

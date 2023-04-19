@@ -1,5 +1,6 @@
 import {Box, Button, TextField} from "@mui/material";
 import {useState} from "react";
+import {useSignupMutation} from "@/store/authApi";
 
 export default function Signup() {
     const [username, setUsername] = useState("");
@@ -13,6 +14,8 @@ export default function Signup() {
 
     const [repeatedPassword, setRepeatedPassword] = useState("");
     const [isRepeatedPasswordError, setIsRepeatedPasswordError] = useState("");
+
+    const [signup] = useSignupMutation();
 
     return <Box component="form" sx={{
         display: "flex",
@@ -70,6 +73,11 @@ export default function Signup() {
                    onFocus={()=>{setIsRepeatedPasswordError("")}}
                    helperText={isRepeatedPasswordError}
         />
-        <Button variant={"contained"}>Sign up</Button>
+        <Button variant={"contained"} onClick={()=> {
+            if (!isUsernameError && !isEmailError && !isPasswordError && !isRepeatedPasswordError) {
+                console.log({username, email, password});
+                signup({username, email, password});
+            }
+        }}>Sign up</Button>
     </Box>
 }
