@@ -2,9 +2,11 @@ const mongoose = require("mongoose");
 
 const Chat = mongoose.model("Chat", new mongoose.Schema({
     chatname: String,
-    participants: [{
+    participants: [String],
+    owner: String,
+    messages: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        ref: "Message"
     }]
 }))
 

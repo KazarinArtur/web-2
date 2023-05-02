@@ -15,8 +15,8 @@ const signup = (req, res) => {
             res.status(500).send({message: err});
             return;
         }
-        res.status(200).send({message: "User successfully added"});
-        console.log(`User with name ${user.username} is added`);
+        res.status(200).send({message: "User has been successfully added"});
+        console.log(`User with name ${user.username} has been added`);
     })
 }
 
@@ -27,12 +27,12 @@ const signin = (req, res) => {
             return;
         }
         if (!user) {
-            res.status(404).send({message: `User with ${req.body.email} not found`});
+            return res.status(404).send({message: `User with ${req.body.email} hasn't been found`});
         }
         const passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
         if (passwordIsValid) {
             const token = jwt.sign({id: user.id}, "secret", {expiresIn: 1000 * 60 * 60});
-            res.status(200).send({message: "User is authenticated", user: {
+            res.status(200).send({message: "User has been authenticated", user: {
                 username: user.username,
                 token
                 }});

@@ -1,16 +1,10 @@
 const mongoose = require("mongoose");
 
 const Message = mongoose.model("Message", new mongoose.Schema({
-    author: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
-    },
-    content: String,
-    sendDate: Date,
-    readBy: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-    }]
+    author: String,
+    text: String,
+    date: String,
+    readBy: [String]
 }))
 
 module.exports = Message;
