@@ -1,6 +1,9 @@
 import {Box, Button, TextField} from "@mui/material";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useSigninMutation} from "@/store/authApi";
+import {useDispatch} from "react-redux";
+import {setUserId} from "@/store/auth/authActions";
+import {useRouter} from "next/router";
 
 export default function Signup() {
     const [email, setEmail] = useState("");
@@ -8,7 +11,18 @@ export default function Signup() {
 
     const [password, setPassword] = useState("");
 
-    const [signin] = useSigninMutation();
+    const [signin, signinResult] = useSigninMutation();
+
+    const dispatch = useDispatch();
+
+    const router = useRouter();
+
+    useEffect(()=>{
+        if (signinResult.isSuccess) {
+            dispatch(setUserId({userId: signinResult.data.payload?.userId}))
+            router.push("/chats")
+        }
+    }, [signinResult])
 
     return <Box component="form" sx={{
         display: "flex",

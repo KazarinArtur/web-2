@@ -13,7 +13,7 @@ export const authApi = createApi({
                 url: "/signup", method: "POST", body: userData
             }),
         }),
-        signin: builder.mutation<{message: string}, {
+        signin: builder.mutation<{message: string, payload: {userId: string}}, {
             email: string;
             password: string
         }>({

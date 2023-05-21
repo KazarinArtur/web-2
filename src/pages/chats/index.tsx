@@ -1,8 +1,6 @@
 import {Box} from "@mui/material";
 import ActiveChat from "@/components/active-chat/ActiveChat";
-import ChatsList from "@/components/chats-list/ChatsList";
 import ChatsListContainer from "@/components/chats-list-container/ChatsListContainer";
-import NewChat from "@/components/new-chat/NewChat";
 
 export default function Chats() {
     return <Box sx={{
@@ -22,19 +20,8 @@ export default function Chats() {
             borderColor: "primary.main",
             borderRadius: "16px"
         }}>
-            <Box sx={{
-                display: "flex",
-                flexDirection: "column"
-            }}>
-
-                <ChatsListContainer />
-                <ChatsList />
-                <NewChat />
-
-            </Box>
-
+            <ChatsListContainer />
             <ActiveChat />
-
         </Box>
     </Box>
 }

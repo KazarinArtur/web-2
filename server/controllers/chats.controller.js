@@ -2,6 +2,18 @@ const db = require("../models");
 
 const Chat = db.chat;
 
+const getChats = (req, res) => {
+    Chat.find({participants: req.params.user}).exec((err, chats)=>{
+        if (err) {
+            return res.status(500).send({message: err});
+        }
+        if (!chats.length) {
+            return res.status(404).send({message: `Chats for ${req.params.user} haven't been found`});
+        }
+        res.status(200).send({message: "Chats have been found", payload: chats});
+    })
+}
+
 const createChat = (req, res) => {
     const chat = new Chat({
         chatname: req.body.chatname,
@@ -15,18 +27,6 @@ const createChat = (req, res) => {
         }
         res.status(200).send({message: "Chat has been successfully added"});
         console.log(`Chat named ${chat.chatname} has been added`);
-    })
-}
-
-const getChats = (req, res) => {
-    Chat.find({participants: req.params.user}).exec((err, chats)=>{
-        if (err) {
-            return res.status(500).send({message: err});
-        }
-        if (!chats.length) {
-            return res.status(404).send({message: `Chats for ${req.params.user} haven't been found`});
-        }
-        res.status(200).send({message: "Chats have been found", chats});
     })
 }
 
@@ -52,25 +52,66 @@ const deleteChat = (req, res) => {
 }
 
 const updateChat = (req, res) => {
-    Chat.updateOne({id: req.params.id}, {
-        chatname: req.body.chatname,
-        participants: req.body.participants,
-        owner: req.body.owner,
-        messages: req.body.messages
-    }).exec((err, chat)=>{
+    const id = req.params.id;
+    Chat.findById(id, (err, chat) => {
         if (err) {
             return res.status(500).send({message: err});
         }
         if (!chat) {
             return res.status(404).send({message: `Chat for ${req.body.id} hasn't been found`});
         }
-        res.status(200).send({message: "Chat has been updated", chat});
+
+        if (req.body.chatname) {
+            Chat.updateOne({_id: id}, {
+                chatname: req.body.chatname
+            }).exec((err, chat) => {
+                if (err) {
+                    return res.status(500).send({message: err});
+                }
+                if (!chat) {
+                    return res.status(404).send({message: `Chat for ${req.body.id} hasn't been found`});
+                }
+                res.status(200).send({message: "Chat name has been updated"});
+            })
+        }
+        if (req.body.participants[0]) {
+            Chat.updateOne({_id: id}, {
+                participants: req.body.participants
+            }).exec((err, chat) => {
+                if (err) {
+                    return res.status(500).send({message: err});
+                }
+                if (!chat) {
+                    return res.status(404).send({message: `Chat for ${req.body.id} hasn't been found`});
+                }
+                res.status(200).send({message: "Chat participants have been updated"});
+            })
+        }
+        if (req.body.owner) {
+            const previousOwner = chat.owner;
+            if (previousOwner === req.body.user) {
+                Chat.updateOne({_id: id}, {
+                    owner: req.body.owner
+                }).exec((err, chat)=>{
+                    if (err) {
+                        return res.status(500).send({message: err});
+                    }
+                    if (!chat) {
+                        return res.status(404).send({message: `Chat for ${req.body.id} hasn't been found`});
+                    }
+                    res.status(200).send({message: "Chat owner has been updated"});
+                })
+            }
+            else {
+                return res.status(401).send({message: `This user can't change the owner of this chat`});
+            }
+        }
     })
 }
 
 module.exports = {
-    createChat,
     getChats,
+    createChat,
     deleteChat,
     updateChat
 }

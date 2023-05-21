@@ -1,15 +1,29 @@
 import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@mui/material";
-import {useState} from "react";
+import {useState, useEffect} from "react";
+import {useCreateChatMutation} from "@/store/chatsApi";
+import {RootState} from "@/store/store";
+import {useSelector} from "react-redux";
 
 export default function NewChat() {
+    const [chatname, setChatname] = useState("");
+    const [isChatnameError, setIsChatnameError] = useState("");
+
     const [open, setOpen] = useState(false);
+
+    const [createChat, createChatResult] = useCreateChatMutation();
+
+    const userId = useSelector((state: RootState) => state.auth.userId);
+
+    useEffect(()=>{
+        if (createChatResult.isSuccess) {
+            setOpen(false)
+        }
+    }, [createChatResult])
 
     return <>
         <Box sx={{
             display: "flex",
-            flexDirection: "column",
-            height: "85vh",
-            width: "15vw",
+            width: "12vw",
             justifyContent: "flex-end",
             alignItems: "flex-end"
         }}>
@@ -34,7 +48,17 @@ export default function NewChat() {
                     justifyContent: "center",
                     marginTop: "1vh"
                 }}>
-                    <TextField label={"Chat name"} fullWidth></TextField>
+                    <TextField label={"Chat name"}
+                               value={chatname}
+                               onChange={(ev)=>setChatname(ev.target.value)}
+                               error={!!isChatnameError}
+                               onBlur={()=>{if (chatname === "") {
+                                   setIsChatnameError("Invalid chatname");
+                               }}}
+                               onFocus={()=>{setIsChatnameError("")}}
+                               helperText={isChatnameError}
+                               fullWidth
+                    />
                 </Box>
             </DialogContent>
             <DialogActions>
@@ -43,7 +67,22 @@ export default function NewChat() {
                     width: "100vw",
                     justifyContent: "center"
                 }}>
-                    <Button variant={"contained"} onClick={() => setOpen(false)}>Confirm</Button>
+                    <Box sx={{
+                        display: "flex",
+                        marginRight: "1vw"
+                    }}>
+                        <Button variant={"outlined"} onClick={() => {
+                            createChat({chatname: chatname, participants: [userId], owner: userId});
+                        }}>Confirm</Button>
+                    </Box>
+                    <Box sx={{
+                        display: "flex",
+                        marginLeft: "1vw"
+                    }}>
+                        <Button variant={"contained"} onClick={() => {
+                            setOpen(false);
+                        }}>Cancel</Button>
+                    </Box>
                 </Box>
             </DialogActions>
         </Dialog>

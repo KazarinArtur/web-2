@@ -4,10 +4,13 @@ const Chat = mongoose.model("Chat", new mongoose.Schema({
     chatname: String,
     participants: [String],
     owner: String,
-    messages: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Message"
-    }]
+    messages: [
+        {
+            author: String,
+            text: String,
+            date: String
+        }
+    ]
 }))
 
 module.exports = Chat;
