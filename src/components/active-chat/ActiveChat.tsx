@@ -1,12 +1,18 @@
 import {Box, TextField, Button} from "@mui/material";
-import MessageItem from "@/components/message-item/MessageItem";
+import {MessageItem} from "@/components/message-item/MessageItem";
 import {useSelector} from "react-redux";
 import {RootState} from "@/store/store";
 import {DeleteChat} from "@/components/delete-chat/deleteChat";
 import {UpdateChat} from "@/components/update-chat/updateChat";
+import {socket} from "@/pages/chats";
+import {useState} from "react";
 
 export default function ActiveChat() {
+    const [newMessage, setNewMessage] = useState("");
+
     const selectedChat = useSelector((state: RootState) => state.chat.selectedChat);
+
+    const userId = useSelector((state: RootState) => state.auth.userId);
 
     return <Box sx={{
         display: "flex",
@@ -74,14 +80,37 @@ export default function ActiveChat() {
                 </Box>
                 <Box sx={{
                     display: "flex",
+                    flexDirection: "column",
+                    height: "73vh",
+                    overflowY: "auto",
+                    scrollbarColor: "teal",
+                    "&::-webkit-scrollbar": {width: "0px"},
+                    marginTop: "1vh"
+                }}>
+                    {selectedChat?.messages.map((message) => (
+                        <MessageItem message={message}/>
+                    ))}
+                </Box>
+                <Box sx={{
+                    display: "flex",
                     flexDirection: "row",
-                    height: "80vh",
                     width: "46vw",
                     alignItems: "flex-end",
                     justifyContent: "flex-end"
                 }}>
-                    <TextField label={"Enter your message"} variant={"standard"} sx={{width: "20vw"}}></TextField>
-                    <Button variant={"contained"}>SEND MESSAGE</Button>
+                    <TextField label={"Enter your message"}
+                               variant={"standard"}
+                               sx={{width: "20vw"}}
+                               value={newMessage}
+                               onChange={(ev)=>setNewMessage(ev.target.value)}
+                    />
+                    <Button variant={"contained"}
+                            onClick={() => {
+                                socket.emit("new_message", {newMessage, id: selectedChat._id, author: userId})
+                            }}
+                    >
+                        SEND MESSAGE
+                    </Button>
                 </Box>
             </>
         ) : (

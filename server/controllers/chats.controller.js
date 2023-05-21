@@ -74,21 +74,26 @@ const updateChat = (req, res) => {
                 res.status(200).send({message: "Chat name has been updated"});
             })
         }
-        if (req.body.participants[0]) {
-            Chat.updateOne({_id: id}, {
-                participants: req.body.participants
-            }).exec((err, chat) => {
-                if (err) {
-                    return res.status(500).send({message: err});
-                }
-                if (!chat) {
-                    return res.status(404).send({message: `Chat for ${req.body.id} hasn't been found`});
-                }
-                res.status(200).send({message: "Chat participants have been updated"});
-            })
+        const previousOwner = chat.owner;
+        if (req.body.participants[1]) {
+            if (previousOwner === req.body.user) {
+                Chat.updateOne({_id: id}, {
+                    participants: req.body.participants
+                }).exec((err, chat) => {
+                    if (err) {
+                        return res.status(500).send({message: err});
+                    }
+                    if (!chat) {
+                        return res.status(404).send({message: `Chat for ${req.body.id} hasn't been found`});
+                    }
+                    res.status(200).send({message: "Chat participants have been updated"});
+                })
+            }
+            else {
+                return res.status(401).send({message: `This user can't add participants to this chat`});
+            }
         }
         if (req.body.owner) {
-            const previousOwner = chat.owner;
             if (previousOwner === req.body.user) {
                 Chat.updateOne({_id: id}, {
                     owner: req.body.owner

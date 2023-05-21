@@ -10,6 +10,7 @@ app.use(express.json());
 const dbConfig = require("./config/db.config");
 
 const db = require("./models");
+const {startWebsocketServer} = require("./ws-server");
 const User = db.user;
 
 db.mongoose.connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
@@ -45,6 +46,8 @@ require("./routes/auth.routes")(app);
 require("./routes/chats.routes")(app);
 require("./routes/authCheck.routes")(app);
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
+
+startWebsocketServer(server)
